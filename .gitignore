@@ -1,0 +1,17 @@
+# colcon
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+
+# C++
+*.o
+*.so
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
