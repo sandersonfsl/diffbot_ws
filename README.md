@@ -21,6 +21,7 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 | Package | Language | Purpose |
 |---|---|---|
 | `diffbot_cpp_examples` | C++ | Core ROS2 concepts (publisher, subscriber, service, action...) |
+| `diffbot_msgs` | Interfaces | Custom msg/srv/action definitions used across DiffBot packages |
 
 ## Build
 
