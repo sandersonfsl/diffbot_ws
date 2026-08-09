@@ -12,8 +12,12 @@ find_package(std_msgs REQUIRED)
 add_executable(simple_publisher src/simple_publisher.cpp)
 ament_target_dependencies(simple_publisher rclcpp std_msgs)
 
+add_executable(simple_subscriber src/simple_subscriber.cpp)
+ament_target_dependencies(simple_subscriber rclcpp std_msgs)
+
 install(TARGETS
   simple_publisher
+  simple_subscriber
   DESTINATION lib/${PROJECT_NAME}
 )
 
