@@ -19,8 +19,9 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 ## Packages
 
 | Package | Language | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `diffbot_cpp_examples` | C++ | Core ROS2 concepts (publisher, subscriber, service, action...) |
+| `diffbot_description` | URDF/Xacro | 3D robot model, visual/collision geometry, joint definitions, and simulation parameters |
 | `diffbot_msgs` | Interfaces | Custom msg/srv/action definitions used across DiffBot packages |
 
 ## Build
