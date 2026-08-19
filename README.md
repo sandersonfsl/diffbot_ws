@@ -24,6 +24,16 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 | `diffbot_description` | URDF/Xacro | 3D robot model, visual/collision geometry, joint definitions, and simulation parameters |
 | `diffbot_msgs` | Interfaces | Custom msg/srv/action definitions used across DiffBot packages |
 
+## TF flow
+
+```
+/joint_states (wheel angles)
+        +
+/robot_description (URDF geometry)
+        ↓  [robot_state_publisher computes the kinematics]
+/tf and /tf_static (3D pose of each link)
+```
+
 ## Build
 
 ```sh
