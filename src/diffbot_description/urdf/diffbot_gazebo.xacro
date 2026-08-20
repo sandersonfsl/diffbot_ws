@@ -42,4 +42,27 @@
     <maxVel>1.0</maxVel>
   </gazebo>
 
+  <!-- ROS 2 Control: this is the Gazebo-side plugin that actually implements
+       the hardware plugin declared in diffbot_ros2_control.xacro (e.g.
+       ign_ros2_control/IgnitionSystem) — it's what connects Gazebo's physics
+       engine to ros2_control's read/write interfaces every simulation step.
+       On load, it also starts the controller_manager, which reads the YAML
+       below to know which controllers to spawn (joint_state_broadcaster,
+       velocity controller, etc). -->
+  <gazebo>
+    <!-- ROS 2 Humble -->
+    <xacro:if value="$(arg is_ignition)">
+      <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+        <parameters>$(find diffbot_controller)/config/diffbot_controllers.yaml</parameters>
+      </plugin>
+    </xacro:if>
+
+    <!-- ROS 2 Iron or above -->
+    <xacro:unless value="$(arg is_ignition)">
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>$(find diffbot_controller)/config/diffbot_controllers.yaml</parameters>
+      </plugin>
+    </xacro:unless>
+  </gazebo>
+
 </robot>

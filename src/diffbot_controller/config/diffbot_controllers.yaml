@@ -1,0 +1,28 @@
+# controller_manager: the node that owns the ros2_control loop. It reads the
+# hardware interface declared in diffbot_ros2_control.xacro and loads the
+# controllers listed below on top of it, at the given update_rate.
+controller_manager:
+  ros__parameters:
+    update_rate: 100 # Hz
+    use_sim_time: true # use Gazebo's /clock instead of the wall clock
+
+    # Broadcaster: doesn't command anything, just reads state_interfaces
+    # (position/velocity) and publishes them on /joint_states, which
+    # robot_state_publisher needs to compute TF.
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    # Controller: writes to command_interfaces. This one takes a target
+    # velocity per joint (via topic) and forwards it to the wheels.
+    simple_velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+
+# Per-controller parameters, keyed by the controller name defined above.
+# "joints" says which of the ros2_control joints this specific controller
+# is allowed to command.
+simple_velocity_controller:
+  ros__parameters:
+    joints:
+      - wheel_left_joint
+      - wheel_right_joint

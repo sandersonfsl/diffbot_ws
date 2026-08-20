@@ -8,6 +8,12 @@
   <!--Materials -->
   <xacro:include filename="$(find diffbot_description)/urdf/diffbot_material.xacro" />
 
+  <!-- Start GZ or Ignition depending on ROS 2 Version -->
+  <xacro:arg name="is_ignition" default="true"/>
+
+  <!-- Include ros2_control Plugins -->
+  <xacro:include filename="$(find diffbot_description)/urdf/diffbot_ros2_control.xacro" />
+
   <link name="base_footprint"/>
   
   <link name="base_link">
@@ -143,7 +149,6 @@
       <geometry>
         <mesh filename="package://diffbot_description/meshes/caster_rear_link.STL" />
       </geometry>
-      <material name="white"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />

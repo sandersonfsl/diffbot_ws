@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diffbot">
+
+    <!-- Hardware Interface: describes what hardware ros2_control is talking to
+         and which interfaces (command/state) it exposes per joint.
+         type="system" = a full interface with multiple joints, read+write
+         (vs "sensor" = read-only, or "actuator" = a single joint). -->
+    <ros2_control name="RobotSystem" type="system">
+
+        <!-- <hardware><plugin> points to the C++ class that actually implements
+             this interface. Here it's not real hardware, it's a simulation
+             plugin that reads/writes joint values from/to Gazebo instead of
+             real motors/encoders. Which plugin depends on the Gazebo version. -->
+        <!-- ROS 2 Humble -->
+        <xacro:if value="$(arg is_ignition)">
+            <hardware>
+                <plugin>ign_ros2_control/IgnitionSystem</plugin>
+            </hardware>
+        </xacro:if>
+
+        <!-- ROS 2 Iron or above -->
+        <xacro:unless value="$(arg is_ignition)">
+            <hardware>
+                <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            </hardware>
+        </xacro:unless>
+
+        <!-- Per-joint interfaces exposed to controllers:
+             - command_interface: what a controller is allowed to WRITE to
+               command the joint (here, target velocity, clamped to [min, max]).
+             - state_interface: what controllers/broadcasters can READ to know
+               the joint's current value (here, position and velocity), fed by
+               the hardware plugin above. -->
+        <joint name="wheel_right_joint">
+            <command_interface name="velocity">
+              <param name="min">-1</param>
+              <param name="max">1</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+
+        <joint name="wheel_left_joint">
+            <command_interface name="velocity">
+              <param name="min">-1</param>
+              <param name="max">1</param>
+            </command_interface>
+            <state_interface name="position" />
+            <state_interface name="velocity" />
+        </joint>
+
+    </ros2_control>
+
+</robot>
