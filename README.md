@@ -41,3 +41,13 @@ cd diffbot_ws
 colcon build
 . install/setup.bash
 ```
+
+## Notes
+
+- **Gazebo inside Docker**: if `ros2 launch diffbot_description gazebo.launch.py` starts but the spawn node (`ros_gz_sim create`) loops forever on `Requesting list of world names` and the Gazebo GUI stays black/frozen, Ignition Transport is likely picking the wrong network interface for discovery (common on hosts with multiple NICs/Docker bridges). Fix by pinning discovery to loopback before launching:
+
+  ```sh
+  export GZ_IP=127.0.0.1
+  export IGN_IP=127.0.0.1
+  ros2 launch diffbot_description gazebo.launch.py
+  ```

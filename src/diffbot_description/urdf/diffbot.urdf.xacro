@@ -2,6 +2,12 @@
 
 <robot name="diffbot" xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <!--Gazebo Parameters -->
+  <xacro:include filename="$(find diffbot_description)/urdf/diffbot_gazebo.xacro" />
+
+  <!--Materials -->
+  <xacro:include filename="$(find diffbot_description)/urdf/diffbot_material.xacro" />
+
   <link name="base_footprint"/>
   
   <link name="base_link">
@@ -17,6 +23,7 @@
       <geometry>
         <mesh filename="package://diffbot_description/meshes/base_link.STL" />
       </geometry>
+      <material name="black"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
@@ -45,6 +52,7 @@
       <geometry>
         <mesh filename="package://diffbot_description/meshes/wheel_right_link.STL" />
       </geometry>
+      <material name="black"/>
     </visual>
     <collision>
       <origin xyz="0 -0.015 0" rpy="1.57 0 0" />
@@ -75,6 +83,7 @@
       <geometry>
         <mesh filename="package://diffbot_description/meshes/wheel_left_link.STL" />
       </geometry>
+      <material name="black"/>
     </visual>
     <collision>
       <origin xyz="0 0.015 0" rpy="-1.57 0 0" />
@@ -104,6 +113,7 @@
       <geometry>
         <mesh filename="package://diffbot_description/meshes/caster_front_link.STL" />
       </geometry>
+      <material name="white"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
@@ -133,6 +143,7 @@
       <geometry>
         <mesh filename="package://diffbot_description/meshes/caster_rear_link.STL" />
       </geometry>
+      <material name="white"/>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />

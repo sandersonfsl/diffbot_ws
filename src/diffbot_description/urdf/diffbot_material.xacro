@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<robot name="diffbot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="black_color" value="0.1 0.1 0.1 1.0" />
+  <xacro:property name="white_color" value="1.0 1.0 1.0 1.0" />
+
+  <material name="black">
+    <color rgba="${black_color}" />
+  </material>
+
+  <material name="white">
+    <color rgba="${white_color}" />
+  </material>
+
+</robot>
