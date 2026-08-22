@@ -86,15 +86,9 @@ colcon build
   ros2 launch diffbot_description gazebo.launch.py
   ```
 
-- **Apt packages installed**:
+- **Dependencies**: declared per-package in each `package.xml`. Install them all with:
 
   ```sh
-  sudo apt update
-  sudo apt install -y ros-humble-ros-gz                                      # Gazebo Fortress + ros_gz_sim/ros_gz_bridge
-  sudo apt install -y ros-humble-ign-ros2-control ros-humble-ros2-controllers  # ros2_control + controller_manager
-  ```
-
-  ```sh
-  sudo apt install -y ros-humble-joy
-  sudo apt install -y ros-humble-joy-teleop
+  rosdep update
+  rosdep install --from-paths src --ignore-src -r -y
   ```
