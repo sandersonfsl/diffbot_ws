@@ -24,6 +24,7 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 | `diffbot_description` | URDF/Xacro | 3D robot model, visual/collision geometry, joint definitions, and simulation parameters |
 | `diffbot_msgs` | Interfaces | Custom msg/srv/action definitions used across DiffBot packages |
 | `diffbot_controller` | Config/Launch/C++ | ros2_control controllers, the `simple_controller` differential-kinematics node, and joystick teleop |
+| `diffbot_localization` | Config/Launch/C++ | Sensor fusion — `imu_republisher` re-frames `/imu/out` to `base_footprint_ekf`; `robot_localization` EKF (`ekf.yaml`) fuses it with noisy wheel odometry (`odom_noisy`) |
 
 ## TF flow
 
@@ -66,6 +67,17 @@ ros2 launch diffbot_controller joystick_teleop.launch.py
 ```
 
 Axis mapping and deadman button are in `diffbot_controller/config/joy_teleop.yaml`; joystick device settings (deadzone, autorepeat rate) in `joy_config.yaml`. `joy_node` resolves `device_id` by SDL2 enumeration order among currently connected joysticks, not by `/dev/input/jsN` number.
+
+## Comparing odometry (PlotJuggler)
+
+With Gazebo, `controller.launch.py` and `local_localization.launch.py` all running, install and open PlotJuggler:
+
+```sh
+sudo apt install -y ros-humble-plotjuggler-ros
+ros2 run plotjuggler plotjuggler
+```
+
+Streaming → Start: "ROS2 Topic Subscriber", pick `/diffbot_controller/odom` (truth), `/diffbot_controller/odom_noisy` (noisy), and `/odometry/filtered` (EKF output). Plot `pose/pose/position/x` vs `.../y` from each on the same XY plot to compare trajectories visually.
 
 
 ## Build
