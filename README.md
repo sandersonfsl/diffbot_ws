@@ -4,6 +4,20 @@ An autonomous differential-drive robot built from scratch in ROS 2 — control, 
 
 Following the base structure of Antonio Brandi's "Self-Driving and ROS 2 - Learn by Doing" reimplemented
 
+## The Robot
+
+<p align="center">
+  <img src="media/diffbot_1.jpg" width="32%">
+  <img src="media/diffbot_2.jpg" width="32%">
+  <img src="media/diffbot_3.jpg" width="32%">
+</p>
+
+<p align="center">
+  <img src="media/diffbot_teleop.gif" width="60%">
+  <br>
+  <sub>Joystick teleop — full clip: <a href="media/diffbot_teleop.MOV">diffbot_teleop.MOV</a></sub>
+</p>
+
 ## Roadmap
 
 - **Phase 1 — Control & Odometry**: ROS2 basics, locomotion, control, kinematics, TF2, odometry, sensor fusion (EKF). 
@@ -29,56 +43,26 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 
 ## Bringup
 
-`diffbot_bringup` holds the top-level launch files that bring up the whole robot in one command, composing the per-package launch files above:
+Top-level launch files (`diffbot_bringup`) that bring up the whole robot in one command:
 
 ```sh
-ros2 launch diffbot_bringup simulated_robot.launch.py   # gazebo.launch.py + controller.launch.py + joystick_teleop.launch.py + local_localization.launch.py
-ros2 launch diffbot_bringup real_robot.launch.py        # hardware_interface.launch.py (diffbot_firmware) + controller.launch.py + joystick_teleop.launch.py + mpu6050_driver.py
+ros2 launch diffbot_bringup simulated_robot.launch.py   # gazebo + controller + joystick + EKF localization
+ros2 launch diffbot_bringup real_robot.launch.py        # diffbot_firmware + controller + joystick + mpu6050_driver
 ```
 
-Both hardcode `use_simple_controller:=False`, so bringup always runs the full `diff_drive_controller` path (odometry + TF + limits) — the `simple_controller` path is for manually launching `diffbot_controller/controller.launch.py` on its own while learning the kinematics (see [ros2_control](#ros2_control) below). `real_robot.launch.py` has no EKF localization step; `diffbot_localization`'s `local_localization.launch.py` is only wired into the simulated bringup so far.
-
-## TF flow
-
-```
-/joint_states (wheel angles)
-        +
-/robot_description (URDF geometry)
-        ↓  [robot_state_publisher computes the kinematics]
-/tf and /tf_static (3D pose of each link)
-```
+Both always run the full `diff_drive_controller` path; `real_robot.launch.py` has no EKF step yet.
 
 ## ros2_control
 
-Wheel velocity control goes through `ros2_control` instead of talking to the Gazebo plugin directly:
+Wheel velocity control goes through `ros2_control`, configured in `diffbot_controller/config/diffbot_controllers.yaml` and picked at launch via `use_simple_controller`:
 
-- **Hardware interface** (`diffbot_description/urdf/diffbot_ros2_control.xacro`): declares `wheel_left_joint`/`wheel_right_joint` with a `velocity` command interface and `position`/`velocity` state interfaces, backed by the `ign_ros2_control/IgnitionSystem` plugin (Humble) or `gz_ros2_control/GazeboSimSystem` (Iron+) — picked automatically via `is_ignition`, set from `ROS_DISTRO` in `gazebo.launch.py`.
-- **Gazebo plugin** (`diffbot_description/urdf/diffbot_gazebo.xacro`): loads the matching `ign_ros2_control-system`/`gz_ros2_control-system` plugin, which starts the `controller_manager` using `diffbot_controller/config/diffbot_controllers.yaml`.
-
-Two mutually exclusive control paths are registered in `diffbot_controllers.yaml`, picked at launch time via `use_simple_controller`:
-
-- **`simple_controller` path** (`use_simple_controller:=True`, default) — a hand-built path for learning the kinematics:
-  - `joint_state_broadcaster`: publishes `/joint_states` from the hardware interface's state_interfaces.
-  - `simple_velocity_controller` (`velocity_controllers/JointGroupVelocityController`): writes to command_interfaces, takes `[wheel_left_joint, wheel_right_joint]` velocities in that order.
-  - `diffbot_controller/src/simple_controller.cpp`: subscribes `geometry_msgs/msg/TwistStamped` on `/diffbot_controller/cmd_vel`, applies the differential-drive inverse kinematics (`wheel_radius`/`wheel_separation` params, default `0.033`/`0.1402203698837279` from the URDF geometry) and publishes wheel velocities to `/simple_velocity_controller/commands`. No odometry, no cmd_vel timeout — it's the manual version of what `diff_drive_controller` does below.
-- **`diffbot_controller` path** (`use_simple_controller:=False`) — the same `wheel_left_joint`/`wheel_right_joint` on `/diffbot_controller/cmd_vel`, but through the built-in `diff_drive_controller/DiffDriveController`: also publishes `/odom` + TF, enforces velocity/acceleration limits, and has a `cmd_vel_timeout` (0.5s) that zeroes commands if `cmd_vel` stops arriving.
-
-Run either with:
+- **`simple_controller`** (default) — hand-built path: `simple_controller.cpp` converts `cmd_vel` to wheel velocities via differential-drive inverse kinematics, no odometry.
+- **`diffbot_controller`** (`use_simple_controller:=False`) — built-in `diff_drive_controller`, also publishes `/odom` + TF and enforces velocity/acceleration limits.
 
 ```sh
-ros2 launch diffbot_controller controller.launch.py                            # simple_controller (default)
+ros2 launch diffbot_controller controller.launch.py                              # simple_controller (default)
 ros2 launch diffbot_controller controller.launch.py use_simple_controller:=False  # diff_drive_controller
 ```
-
-## Joystick teleop
-
-`diffbot_controller/launch/joystick_teleop.launch.py` publishes `TwistStamped` on `/diffbot_controller/cmd_vel` from a gamepad (tested with a Logitech F710), via `joy_node` + `joy_teleop`:
-
-```sh
-ros2 launch diffbot_controller joystick_teleop.launch.py
-```
-
-Axis mapping and deadman button are in `diffbot_controller/config/joy_teleop.yaml`; joystick device settings (deadzone, autorepeat rate) in `joy_config.yaml`. `joy_node` resolves `device_id` by SDL2 enumeration order among currently connected joysticks, not by `/dev/input/jsN` number.
 
 ## Comparing odometry (PlotJuggler)
 
@@ -99,6 +83,17 @@ cd diffbot_ws
 colcon build
 . install/setup.bash
 ```
+
+## Battery (3S LiPo, 2.2Ah)
+
+| | Voltage | Per cell |
+| --- | --- | --- |
+| Fully charged (safe) | 12.6V | 4.2V |
+| Minimum charged (safe) — below this can cause permanent damage | 9V | 3.0V |
+| Recommended cutoff range | 9.9V – 11.1V | 3.3V – 3.7V |
+| Storage voltage | 11.4V | 3.8V |
+
+Safe charging current: 1C × 2.2Ah = **2.2A**
 
 ## Notes
 
