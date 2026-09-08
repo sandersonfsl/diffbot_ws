@@ -111,3 +111,15 @@ Safe charging current: 1C × 2.2Ah = **2.2A**
   rosdep update
   rosdep install --from-paths src --ignore-src -r -y
   ```
+
+## Acknowledgments
+
+DiffBot is a from-scratch reimplementation of the robot built in Antonio Brandi's "Self-Driving and ROS 2 - Learn by Doing" course series — every package here was written independently, following the course's structure and design as a reference, not copied from it. The original course repos are licensed under the Apache License 2.0:
+
+- [Self-Driving and ROS 2 - Learn by Doing! Odometry & Control](https://github.com/AntoBrandi/Self-Driving-and-ROS-2-Learn-by-Doing-Odometry-Control)
+- [Self-Driving and ROS 2 - Learn by Doing! Map & Localization](https://github.com/AntoBrandi/Self-Driving-and-ROS-2-Learn-by-Doing-Map-Localization)
+- [Self-Driving and ROS 2 - Learn by Doing! Plan & Navigation](https://github.com/AntoBrandi/Self-Driving-and-ROS-2-Learn-by-Doing-Plan-Navigation)
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE), matching the license of the course material this project is based on.

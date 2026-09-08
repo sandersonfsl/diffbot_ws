@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Top-level launch files that bring up the whole DiffBot stack, simulated or real</description>
   <maintainer email="sandersonfarias@gmail.com">developer</maintainer>
-  <license>MIT</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

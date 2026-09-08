@@ -5,7 +5,7 @@
   <version>0.0.0</version>
   <description>Real hardware interface for DiffBot — Arduino serial link and MPU6050 IMU driver</description>
   <maintainer email="sandersonfarias@gmail.com">developer</maintainer>
-  <license>MIT</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
