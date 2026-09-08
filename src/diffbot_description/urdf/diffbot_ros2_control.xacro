@@ -8,20 +8,30 @@
     <ros2_control name="RobotSystem" type="system">
 
         <!-- <hardware><plugin> points to the C++ class that actually implements
-             this interface. Here it's not real hardware, it's a simulation
-             plugin that reads/writes joint values from/to Gazebo instead of
-             real motors/encoders. Which plugin depends on the Gazebo version. -->
-        <!-- ROS 2 Humble -->
-        <xacro:if value="$(arg is_ignition)">
-            <hardware>
-                <plugin>ign_ros2_control/IgnitionSystem</plugin>
-            </hardware>
+             this interface. In simulation it reads/writes joint values from/to
+             Gazebo; on the real robot it talks to the Arduino over serial via
+             diffbot_firmware/DiffbotInterface instead. -->
+        <xacro:if value="$(arg is_sim)">
+            <!-- ROS 2 Humble -->
+            <xacro:if value="$(arg is_ignition)">
+                <hardware>
+                    <plugin>ign_ros2_control/IgnitionSystem</plugin>
+                </hardware>
+            </xacro:if>
+
+            <!-- ROS 2 Iron or above -->
+            <xacro:unless value="$(arg is_ignition)">
+                <hardware>
+                    <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+                </hardware>
+            </xacro:unless>
         </xacro:if>
 
-        <!-- ROS 2 Iron or above -->
-        <xacro:unless value="$(arg is_ignition)">
+        <!-- Real robot: Arduino hardware interface (diffbot_firmware) -->
+        <xacro:unless value="$(arg is_sim)">
             <hardware>
-                <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+                <plugin>diffbot_firmware/DiffbotInterface</plugin>
+                <param name="port">/dev/ttyUSB0</param>
             </hardware>
         </xacro:unless>
 

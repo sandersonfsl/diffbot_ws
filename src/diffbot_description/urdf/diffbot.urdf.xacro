@@ -5,6 +5,9 @@
   <!-- Start GZ or Ignition depending on ROS 2 Version -->
   <xacro:arg name="is_ignition" default="true"/>
 
+  <!-- Load Simulated (Gazebo) or Real (Arduino via diffbot_firmware) Hardware Interface -->
+  <xacro:arg name="is_sim" default="true"/>
+
   <!--Gazebo Parameters -->
   <xacro:include filename="$(find diffbot_description)/urdf/diffbot_gazebo.xacro" />
 

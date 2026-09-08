@@ -4,7 +4,6 @@
 controller_manager:
   ros__parameters:
     update_rate: 100 # Hz
-    use_sim_time: true # use Gazebo's /clock instead of the wall clock
 
     # A Controller (same category as simple_velocity_controller, writes to
     # command_interfaces) that folds two things we had as separate pieces

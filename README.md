@@ -20,11 +20,23 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 
 | Package | Language | Purpose |
 | --- | --- | --- |
-| `diffbot_cpp_examples` | C++ | Core ROS2 concepts (publisher, subscriber, service, action...) |
 | `diffbot_description` | URDF/Xacro | 3D robot model, visual/collision geometry, joint definitions, and simulation parameters |
 | `diffbot_msgs` | Interfaces | Custom msg/srv/action definitions used across DiffBot packages |
 | `diffbot_controller` | Config/Launch/C++ | ros2_control controllers, the `simple_controller` differential-kinematics node, and joystick teleop |
 | `diffbot_localization` | Config/Launch/C++ | Sensor fusion — `imu_republisher` re-frames `/imu/out` to `base_footprint_ekf`; `robot_localization` EKF (`ekf.yaml`) fuses it with noisy wheel odometry (`odom_noisy`) |
+| `diffbot_firmware` | C++/Python/Arduino | Real hardware only — `diffbot_interface` (`hardware_interface::SystemInterface` plugin, talks to the Arduino over `LibSerial`/`/dev/ttyUSB0`), `mpu6050_driver.py` (I2C IMU driver publishing `/imu/out`), and the `robot_control`/`robot_control_inverted` Arduino sketches |
+| `diffbot_bringup` | Launch | Top-level launch files — `simulated_robot.launch.py` (Gazebo + controller + joystick + EKF localization) and `real_robot.launch.py` (`diffbot_firmware` hardware interface + controller + joystick + `mpu6050_driver`) |
+
+## Bringup
+
+`diffbot_bringup` holds the top-level launch files that bring up the whole robot in one command, composing the per-package launch files above:
+
+```sh
+ros2 launch diffbot_bringup simulated_robot.launch.py   # gazebo.launch.py + controller.launch.py + joystick_teleop.launch.py + local_localization.launch.py
+ros2 launch diffbot_bringup real_robot.launch.py        # hardware_interface.launch.py (diffbot_firmware) + controller.launch.py + joystick_teleop.launch.py + mpu6050_driver.py
+```
+
+Both hardcode `use_simple_controller:=False`, so bringup always runs the full `diff_drive_controller` path (odometry + TF + limits) — the `simple_controller` path is for manually launching `diffbot_controller/controller.launch.py` on its own while learning the kinematics (see [ros2_control](#ros2_control) below). `real_robot.launch.py` has no EKF localization step; `diffbot_localization`'s `local_localization.launch.py` is only wired into the simulated bringup so far.
 
 ## TF flow
 
