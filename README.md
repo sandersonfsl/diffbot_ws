@@ -18,6 +18,8 @@ Following the base structure of Antonio Brandi's "Self-Driving and ROS 2 - Learn
   <sub>Joystick teleop — full clip: <a href="media/diffbot_teleop.MOV">diffbot_teleop.MOV</a></sub>
 </p>
 
+Sensors: MPU6050 IMU and an [RPLIDAR C1](datasheets/rplidar_c1_datasheet.pdf) 2D LiDAR.
+
 ## Roadmap
 
 - **Phase 1 — Control & Odometry**: ROS2 basics, locomotion, control, kinematics, TF2, odometry, sensor fusion (EKF). 

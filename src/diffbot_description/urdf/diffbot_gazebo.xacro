@@ -57,6 +57,9 @@
       </plugin>
       <plugin filename="ignition-gazebo-imu-system" name="ignition::gazebo::systems::Imu">
       </plugin>
+      <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+      </plugin>
     </xacro:if>
 
     <!-- ROS 2 Iron or above -->
@@ -65,6 +68,9 @@
         <parameters>$(find diffbot_controller)/config/diffbot_controllers.yaml</parameters>
       </plugin>
       <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+      </plugin>
+      <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+        <render_engine>ogre2</render_engine>
       </plugin>
     </xacro:unless>
   </gazebo>
@@ -118,6 +124,41 @@
             </z>
           </linear_acceleration>
         </imu>
+    </sensor>
+  </gazebo>
+
+  <!-- 2D Laser Sensor (RPLIDAR C1) -->
+  <gazebo reference="laser_link">
+    <sensor name="lidar" type="gpu_lidar">
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <topic>scan</topic>
+      <update_rate>10</update_rate>
+      <gz_frame_id>laser_link</gz_frame_id>
+      <!-- laser_link's own origin is the mesh's bottom mounting face (z=0);
+           the RPLIDAR C1 datasheet places the actual optical window 29.8mm
+           above that, so the raycast origin is offset up to match. -->
+      <pose>0 0 0.0298 0 0 0</pose>
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1.00000</resolution>
+            <min_angle>0.000000</min_angle>
+            <max_angle>6.280000</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.050000</min>
+          <max>12.0</max>
+          <resolution>0.02</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
     </sensor>
   </gazebo>
 
