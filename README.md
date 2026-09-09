@@ -54,6 +54,12 @@ ros2 launch diffbot_bringup real_robot.launch.py        # diffbot_firmware + con
 
 Both always run the full `diff_drive_controller` path; `real_robot.launch.py` has no EKF step yet.
 
+<p align="center">
+  <img src="media/simulated_diffbot.png" width="80%">
+  <br>
+  <sub>simulated_robot.launch.py — Gazebo (left) and RViz (right)</sub>
+</p>
+
 ## ros2_control
 
 Wheel velocity control goes through `ros2_control`, configured in `diffbot_controller/config/diffbot_controllers.yaml` and picked at launch via `use_simple_controller`:
