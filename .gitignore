@@ -15,3 +15,6 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+# Personal notes — never pushed, local-only
+notes/

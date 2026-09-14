@@ -41,9 +41,16 @@ def generate_launch_description():
         executable="mpu6050_driver.py"
     )
 
+    safety_stop = Node(
+        package="diffbot_utils",
+        executable="safety_stop",
+        output="screen",
+    )
+
     return LaunchDescription([
         hardware_interface,
         controller,
         joystick,
         imu_driver_node,
+        safety_stop,
     ])

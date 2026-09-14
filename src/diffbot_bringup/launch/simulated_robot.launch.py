@@ -1,6 +1,7 @@
 import os
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
+from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
 
@@ -43,9 +44,17 @@ def generate_launch_description():
         ),
     )
 
+    safety_stop = Node(
+        package="diffbot_utils",
+        executable="safety_stop",
+        output="screen",
+        parameters=[{"use_sim_time": True}]
+    )
+
     return LaunchDescription([
         gazebo,
         controller,
         joystick,
+        safety_stop,
         localization,
     ])

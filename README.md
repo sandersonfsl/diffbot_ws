@@ -41,7 +41,8 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 | `diffbot_controller` | Config/Launch/C++ | ros2_control controllers, the `simple_controller` differential-kinematics node, and joystick teleop |
 | `diffbot_localization` | Config/Launch/C++ | Sensor fusion — `imu_republisher` re-frames `/imu/out` to `base_footprint_ekf`; `robot_localization` EKF (`ekf.yaml`) fuses it with noisy wheel odometry (`odom_noisy`) |
 | `diffbot_firmware` | C++/Python/Arduino | Real hardware only — `diffbot_interface` (`hardware_interface::SystemInterface` plugin, talks to the Arduino over `LibSerial`/`/dev/ttyUSB0`), `mpu6050_driver.py` (I2C IMU driver publishing `/imu/out`), and the `robot_control`/`robot_control_inverted` Arduino sketches |
-| `diffbot_bringup` | Launch | Top-level launch files — `simulated_robot.launch.py` (Gazebo + controller + joystick + EKF localization) and `real_robot.launch.py` (`diffbot_firmware` hardware interface + controller + joystick + `mpu6050_driver`) |
+| `diffbot_utils` | C++ | `safety_stop` — watches `/scan`, publishes the `twist_mux` `safety_stop` lock and calls its `joy_turbo_increase`/`decrease` actions as obstacles enter the warning/danger zones |
+| `diffbot_bringup` | Launch | Top-level launch files — `simulated_robot.launch.py` (Gazebo + controller + joystick + EKF localization + `safety_stop`) and `real_robot.launch.py` (`diffbot_firmware` hardware interface + controller + joystick + `mpu6050_driver` + `safety_stop`) |
 
 ## Bringup
 
