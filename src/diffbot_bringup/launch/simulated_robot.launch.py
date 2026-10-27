@@ -1,17 +1,23 @@
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
+    world_name_arg = DeclareLaunchArgument(name="world_name", default_value="empty")
+
     gazebo = IncludeLaunchDescription(
         os.path.join(
             get_package_share_directory("diffbot_description"),
             "launch",
             "gazebo.launch.py"
         ),
+        launch_arguments={
+            "world_name": LaunchConfiguration("world_name")
+        }.items(),
     )
 
     controller = IncludeLaunchDescription(
@@ -52,6 +58,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        world_name_arg,
         gazebo,
         controller,
         joystick,

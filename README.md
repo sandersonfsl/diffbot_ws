@@ -88,8 +88,20 @@ Streaming → Start: "ROS2 Topic Subscriber", pick `/diffbot_controller/odom` (t
 
 ## Build
 
+This repo uses [Git LFS](https://git-lfs.com/) for large binary assets (robot
+photos/videos in `media/`, Gazebo world models in
+`diffbot_description/models/`). Install it **before** cloning, or those files
+come through as tiny text pointers instead of their real content:
+
 ```sh
+git lfs install              # once per machine
+git clone <repo-url>
 cd diffbot_ws
+# already cloned without LFS set up? pull the real files now:
+git lfs pull
+```
+
+```sh
 colcon build
 . install/setup.bash
 ```
@@ -113,6 +125,12 @@ Safe charging current: 1C × 2.2Ah = **2.2A**
   export GZ_IP=127.0.0.1
   export IGN_IP=127.0.0.1
   ros2 launch diffbot_description gazebo.launch.py
+  ```
+
+- **Simulated worlds other than empty** (`small_house`, `small_warehouse` — used for mapping/localization testing): world files live in `diffbot_description/worlds/`; the ~95MB of AWS RoboMaker furniture/wall models they reference live in `diffbot_description/models/`, tracked via Git LFS (see "Build" above — make sure `git lfs pull` has actually run). Then:
+
+  ```sh
+  ros2 launch diffbot_bringup simulated_robot.launch.py world_name:=small_house
   ```
 
 - **Dependencies**: declared per-package in each `package.xml`. Install them all with:

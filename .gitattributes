@@ -8,3 +8,7 @@ media/*.WEBM filter=lfs diff=lfs merge=lfs -text
 media/*.MOV filter=lfs diff=lfs merge=lfs -text
 media/*.MP4 filter=lfs diff=lfs merge=lfs -text
 media/*.MKV filter=lfs diff=lfs merge=lfs -text
+src/diffbot_description/models/**/*.DAE filter=lfs diff=lfs merge=lfs -text
+src/diffbot_description/models/**/*.dae filter=lfs diff=lfs merge=lfs -text
+src/diffbot_description/models/**/*.png filter=lfs diff=lfs merge=lfs -text
+src/diffbot_description/models/**/*.psd filter=lfs diff=lfs merge=lfs -text
