@@ -39,8 +39,8 @@ diffbot_ws/         # real ROS2 workspace (colcon) — code lives and builds her
 | `diffbot_description` | URDF/Xacro | 3D robot model, visual/collision geometry, joint definitions, and simulation parameters |
 | `diffbot_msgs` | Interfaces | Custom msg/srv/action definitions used across DiffBot packages |
 | `diffbot_controller` | Config/Launch/C++ | ros2_control controllers, the `simple_controller` differential-kinematics node, and joystick teleop |
-| `diffbot_localization` | Config/Launch/C++ | Sensor fusion — `imu_republisher` re-frames `/imu/out` to `base_footprint_ekf`; `robot_localization` EKF (`ekf.yaml`) fuses it with noisy wheel odometry (`odom_noisy`). Also `global_localization.launch.py` — `nav2_map_server` + `nav2_amcl` (`amcl.yaml`) + `nav2_lifecycle_manager`, particle-filter localization against a static map from `diffbot_mapping` (manual/standalone, not in bringup yet) |
-| `diffbot_mapping` | C++/Data | `mapping_with_known_poses` — hand-built log-odds occupancy grid mapper (Bresenham + inverse sensor model) from `/scan` + TF, run manually; pre-built maps (`small_house`, `small_warehouse`) for `nav2_map_server` |
+| `diffbot_localization` | Config/Launch/C++ | Sensor fusion — `imu_republisher` re-frames `/imu/out` to `base_footprint_ekf`; `robot_localization` EKF (`ekf.yaml`) fuses it with noisy wheel odometry (`odom_noisy`). Also `global_localization.launch.py` — `nav2_map_server` + `nav2_amcl` (`amcl.yaml`) + `nav2_lifecycle_manager`, particle-filter localization against a static map from `diffbot_mapping`; part of `simulated_robot.launch.py` bringup by default (`use_slam:=false`) |
+| `diffbot_mapping` | C++/Data | `mapping_with_known_poses` — hand-built log-odds occupancy grid mapper (Bresenham + inverse sensor model) from `/scan` + TF, run manually; pre-built maps (`small_house`, `small_warehouse`) for `nav2_map_server`; `slam.launch.py` — `slam_toolbox` (graph SLAM) + `map_saver_server`, wired into bringup via `use_slam:=true` |
 | `diffbot_firmware` | C++/Python/Arduino | Real hardware only — `diffbot_interface` (`hardware_interface::SystemInterface` plugin, talks to the Arduino over `LibSerial`/`/dev/ttyUSB0`), `mpu6050_driver.py` (I2C IMU driver publishing `/imu/out`), and the `robot_control`/`robot_control_inverted` Arduino sketches |
 | `diffbot_utils` | C++ | `safety_stop` — watches `/scan`, publishes the `twist_mux` `safety_stop` lock and calls its `joy_turbo_increase`/`decrease` actions as obstacles enter the warning/danger zones |
 | `diffbot_bringup` | Launch | Top-level launch files — `simulated_robot.launch.py` (Gazebo + controller + joystick + EKF localization + `safety_stop`) and `real_robot.launch.py` (`diffbot_firmware` hardware interface + controller + joystick + `mpu6050_driver` + `safety_stop`) |
@@ -55,6 +55,12 @@ ros2 launch diffbot_bringup real_robot.launch.py        # diffbot_firmware + con
 ```
 
 Both always run the full `diff_drive_controller` path; `real_robot.launch.py` has no EKF step yet.
+
+`simulated_robot.launch.py` also takes `use_slam` (default `false`): `false` runs AMCL against a known map (`map_name`, default `small_house`); `true` runs `slam_toolbox` instead to build a new map live, with a matching RViz config for each. The EKF (`local_localization`) runs either way — it's a separate, lower layer (fuses wheel odom + IMU) from this map-relative choice.
+
+```sh
+ros2 launch diffbot_bringup simulated_robot.launch.py world_name:=small_house use_slam:=true
+```
 
 <p align="center">
   <img src="media/simulated_diffbot.png" width="80%">
