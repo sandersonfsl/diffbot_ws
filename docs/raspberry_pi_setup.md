@@ -183,54 +183,41 @@ sudo udevadm trigger
 sudo service udev restart
 ```
 
-Project setup (Arduino Nano w/ ATmega328P):
+The project itself lives in the repo at
+[`diffbot_firmware_pio/`](../diffbot_firmware_pio/) — a sibling of `src/`, not a
+colcon package, since it builds for the Arduino Nano, not for ROS 2. It's the
+priority firmware path going forward, kept separate from the Arduino-IDE-style
+sketch in `src/diffbot_firmware/firmware/` (same pins, same serial protocol —
+just a different toolchain). `diffbot_firmware_pio/examples/` has smaller,
+single-purpose sketches used while bringing the hardware up incrementally
+(motor direction only, encoder reading only, ...) before the full
+`src/main.cpp`; the wiring for the two most useful ones is diagrammed in
+[`docs/schematics/simple_motor_control.png`](schematics/simple_motor_control.png)
+and
+[`docs/schematics/simple_encoder_reader.png`](schematics/simple_encoder_reader.png)
+(same pin numbers as the sketches). The full build — battery, L298N, both
+motors/encoders, Nano, Raspberry Pi, MPU6050 — is in
+[`docs/schematics/diffbot_full_wiring.png`](schematics/diffbot_full_wiring.png).
 
 ```sh
 pio boards nano   # confirms the board id: nanoatmega328
-mkdir -p ~/diffbot/diffbot_firmware_pio/src
-cd ~/diffbot/diffbot_firmware_pio
-pio project init --board nanoatmega328
-touch src/main.cpp   # paste the .ino sketch content here (robot_control.ino / robot_control_inverted.ino)
-```
-
-`platformio.ini` — supports both a Nano and an Uno as build targets, switchable via
-`default_envs`:
-
-```ini
-[platformio]
-default_envs = nanoatmega328 ; change to nanoatmega328 or uno
-
-[env:nanoatmega328]
-platform = atmelavr
-board = nanoatmega328
-framework = arduino
-upload_speed = 115200
-monitor_speed = 115200
-lib_deps =
-    br3ttb/PID @ ^1.2.1
-
-[env:uno]
-platform = atmelavr
-board = uno
-framework = arduino
-upload_speed = 115200
-monitor_speed = 115200
-lib_deps =
-    br3ttb/PID @ ^1.2.1
-```
-
-Usage:
-
-```sh
-pio run --target upload        # build + flash (uses default_envs)
+cd ~/development/diffbot_ws/diffbot_firmware_pio
+pio run --target upload        # build + flash (uses default_envs in platformio.ini)
 pio run -e nanoatmega328 -t upload   # explicit env, useful with multiple [env:...] blocks
 pio run --target clean
-pio device monitor             # serial monitor, e.g. for the motor test sketch
+pio device monitor             # serial monitor
 ```
 
 ## Docker (ROS 2 Humble container on the Pi)
 
+Built from [`docker/Dockerfile`](../docker/Dockerfile). It intentionally does **not**
+hardcode the ROS package list (that's how the old bumperbot image went stale once
+Phase 2 — AMCL, SLAM, twist_mux, robot_localization, joy — was added): it ships only
+base dev tools, and every actual ROS dependency gets pulled in afterwards via
+`rosdep` against the real `package.xml` files in the mounted workspace.
+
 ```sh
+cd ~/development/diffbot_ws/docker
 docker build -t diffbot_humble .
 ```
 
@@ -245,6 +232,15 @@ docker run -dt \
   diffbot_humble
 ```
 
+First time (or whenever a package.xml gains a new dependency):
+
+```sh
+docker exec -it diffbot_humble /bin/bash
+cd /development/diffbot_ws
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+```
+
 Day to day:
 
 ```sh
@@ -252,14 +248,10 @@ docker exec -it diffbot_humble /bin/bash   # re-enter
 docker start diffbot_humble               # restart if exited
 ```
 
-## MPU6050 IMU — I2C setup (inside the container)
+## MPU6050 IMU — I2C setup
 
-Dockerfile additions:
-
-```dockerfile
-RUN apt-get update && apt-get install -y \
-    i2c-tools \
-    libi2c-dev \
-    python3-smbus
-RUN pip3 install smbus2
-```
+`i2c-tools`, `libi2c-dev`, `python3-smbus` come in automatically via the
+`rosdep install` step above (declared in `diffbot_firmware/package.xml`); the
+Dockerfile only adds `smbus2` directly, since nothing in `mpu6050_driver.py`
+actually imports it today (it imports `smbus`) — kept installed in case that
+changes, not currently load-bearing.

@@ -20,6 +20,9 @@ Following the base structure of Antonio Brandi's "Self-Driving and ROS 2 - Learn
 
 Sensors: MPU6050 IMU and an [RPLIDAR C1](datasheets/rplidar_c1_datasheet.pdf) 2D LiDAR.
 
+Full wiring diagram (battery → L298N → motors/encoders → Arduino Nano → Raspberry Pi → MPU6050):
+[`docs/schematics/diffbot_full_wiring.png`](docs/schematics/diffbot_full_wiring.png) ([Fritzing source](docs/schematics/diffbot_full_wiring.fzz)).
+
 ## Roadmap
 
 - **Phase 1 — Control & Odometry**: ROS2 basics, locomotion, control, kinematics, TF2, odometry, sensor fusion (EKF). 
