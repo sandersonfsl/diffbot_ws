@@ -18,6 +18,12 @@ Following the base structure of Antonio Brandi's "Self-Driving and ROS 2 - Learn
   <sub>Joystick teleop — full clip: <a href="media/diffbot_teleop.MOV">diffbot_teleop.MOV</a></sub>
 </p>
 
+<p align="center">
+  <img src="media/diffbot_slam.gif" width="60%">
+  <br>
+  <sub>Real-world SLAM — robot camera (top) and RViz2 (bottom), side by side. Full clip: <a href="media/diffbot_live_slam_split.mp4">diffbot_live_slam_split.mp4</a></sub>
+</p>
+
 Sensors: MPU6050 IMU and an [RPLIDAR C1](datasheets/rplidar_c1_datasheet.pdf) 2D LiDAR.
 
 Full wiring diagram (battery → L298N → motors/encoders → Arduino Nano → Raspberry Pi → MPU6050):
