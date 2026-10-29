@@ -31,7 +31,7 @@
         <xacro:unless value="$(arg is_sim)">
             <hardware>
                 <plugin>diffbot_firmware/DiffbotInterface</plugin>
-                <param name="port">/dev/ttyUSB0</param>
+                <param name="port">/dev/arduino</param>
             </hardware>
         </xacro:unless>
 

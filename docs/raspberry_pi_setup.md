@@ -93,6 +93,42 @@ sudo usermod -aG dialout $USER
 Group membership only applies to new login sessions — log out/in (or `su - $USER`) to pick
 it up without a full reboot.
 
+## udev rules — stable serial device names (Arduino Nano, RPLIDAR C1)
+
+Both the Nano and the RPLIDAR C1 show up as `/dev/ttyUSB*`, and which one gets
+`ttyUSB0` vs `ttyUSB1` depends on USB enumeration order at boot — not safe to
+hardcode. Identified each device's chip via:
+
+```sh
+udevadm info -a -n /dev/ttyUSB0 | grep -E "idVendor|idProduct|serial|product|manufacturer"
+udevadm info -a -n /dev/ttyUSB1 | grep -E "idVendor|idProduct|serial|product|manufacturer"
+```
+
+Confirmed on this robot: Nano = CH340 clone (`1a86:7523`), RPLIDAR C1 = Silicon
+Labs CP2102N (`10c4:ea60` — same chip/rule the `sllidar_ros2` package ships by
+default). Different vendor:product pairs, so both rules coexist safely.
+
+`/etc/udev/rules.d/99-arduino.rules`:
+
+```
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE:="0666", SYMLINK+="arduino"
+```
+
+`/etc/udev/rules.d/99-rplidar.rules`:
+
+```
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0666", SYMLINK+="rplidar"
+```
+
+```sh
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+ls -l /dev/arduino /dev/rplidar   # both should now point at the right ttyUSB*
+```
+
+`diffbot_description/urdf/diffbot_ros2_control.xacro` points at `/dev/arduino` for
+this reason — don't revert it to a raw `ttyUSB0`/`ttyUSB1`.
+
 ## Bluetooth joystick (Logitech F710)
 
 ```sh
