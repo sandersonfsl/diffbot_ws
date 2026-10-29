@@ -1,11 +1,20 @@
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition, UnlessCondition
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
 
 def generate_launch_description():
+    use_slam = LaunchConfiguration("use_slam")
+
+    use_slam_arg = DeclareLaunchArgument(
+        "use_slam",
+        default_value="false"
+    )
+
     hardware_interface = IncludeLaunchDescription(
         os.path.join(
             get_package_share_directory("diffbot_firmware"),
@@ -59,11 +68,38 @@ def generate_launch_description():
         output="screen",
     )
 
+    localization = IncludeLaunchDescription(
+        os.path.join(
+            get_package_share_directory("diffbot_localization"),
+            "launch",
+            "global_localization.launch.py"
+        ),
+        launch_arguments={
+            "use_sim_time": "False"
+        }.items(),
+        condition=UnlessCondition(use_slam)
+    )
+
+    slam = IncludeLaunchDescription(
+        os.path.join(
+            get_package_share_directory("diffbot_mapping"),
+            "launch",
+            "slam.launch.py"
+        ),
+        launch_arguments={
+            "use_sim_time": "False"
+        }.items(),
+        condition=IfCondition(use_slam)
+    )
+
     return LaunchDescription([
+        use_slam_arg,
         hardware_interface,
         laser_driver,
         controller,
         joystick,
         imu_driver_node,
         safety_stop,
+        localization,
+        slam,
     ])
