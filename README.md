@@ -123,6 +123,13 @@ colcon build
 
 Safe charging current: 1C × 2.2Ah = **2.2A**
 
+## Real hardware setup (Raspberry Pi 5)
+
+The onboard computer is a Raspberry Pi 5 (16GB), running Ubuntu Server 24.04 + a ROS 2 Humble
+Docker container. OS install, networking, Bluetooth joystick pairing, udev rules, PlatformIO
+(Arduino Nano firmware), and the Docker setup are documented in
+[`docs/raspberry_pi_setup.md`](docs/raspberry_pi_setup.md).
+
 ## Notes
 
 - **Gazebo inside Docker**: if `ros2 launch diffbot_description gazebo.launch.py` starts but the spawn node (`ros_gz_sim create`) loops forever on `Requesting list of world names` and the Gazebo GUI stays black/frozen, Ignition Transport is likely picking the wrong network interface for discovery (common on hosts with multiple NICs/Docker bridges). Fix by pinning discovery to loopback before launching:
