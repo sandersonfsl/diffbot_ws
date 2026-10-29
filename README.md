@@ -99,15 +99,19 @@ Streaming → Start: "ROS2 Topic Subscriber", pick `/diffbot_controller/odom` (t
 
 This repo uses [Git LFS](https://git-lfs.com/) for large binary assets (robot
 photos/videos in `media/`, Gazebo world models in
-`diffbot_description/models/`). Install it **before** cloning, or those files
-come through as tiny text pointers instead of their real content:
+`diffbot_description/models/`), and `src/sllidar_ros2` is a git **submodule**
+([Slamtec's official driver](https://github.com/Slamtec/sllidar_ros2)) rather
+than vendored code. Install Git LFS **before** cloning, or those files come
+through as tiny text pointers instead of their real content, and clone with
+`--recurse-submodules` or `sllidar_ros2` will be an empty directory:
 
 ```sh
-git lfs install              # once per machine
-git clone <repo-url>
+git lfs install                                   # once per machine
+git clone --recurse-submodules <repo-url>
 cd diffbot_ws
-# already cloned without LFS set up? pull the real files now:
+# already cloned without LFS/submodules set up? fetch them now:
 git lfs pull
+git submodule update --init --recursive
 ```
 
 ```sh

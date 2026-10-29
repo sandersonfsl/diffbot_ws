@@ -14,6 +14,18 @@ def generate_launch_description():
         ),
     )
 
+    laser_driver = Node(
+        package="sllidar_ros2",
+        executable="sllidar_node",
+        name="sllidar_node",
+        parameters=[os.path.join(
+            get_package_share_directory("diffbot_bringup"),
+            "config",
+            "rplidar_c1.yaml"
+        )],
+        output="screen"
+    )
+
     controller = IncludeLaunchDescription(
         os.path.join(
             get_package_share_directory("diffbot_controller"),
@@ -49,6 +61,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         hardware_interface,
+        laser_driver,
         controller,
         joystick,
         imu_driver_node,
